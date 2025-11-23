@@ -1,23 +1,28 @@
-import logo from './logo.svg';
-import './App.css';
+import { useFetch } from "./hooks/useFetch";
+import { useLocalStorage } from "./hooks/useLocalStorage";
+import { useToggle } from "./hooks/useToggle";
 
 function App() {
+  const { data, loading, error } = useFetch("https://jsonplaceholder.typicode.com/users");
+  const [theme, setTheme] = useLocalStorage("theme", "light");
+  const [open, toggleOpen] = useToggle(false);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error...</p>;
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className={theme}>
+      <button onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
+        Toggle Theme
+      </button>
+      <button onClick={toggleOpen}>
+        {open ? "Close Navbar" : "Open Navbar"}
+      </button>
+      {open && (
+        <nav>
+          {data.map(user => <p key={user.id}>{user.name}</p>)}
+        </nav>
+      )}
     </div>
   );
 }
